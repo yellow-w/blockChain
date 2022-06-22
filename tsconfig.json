@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "*": ["@types/*"]
+    },
+    "target": "es5",
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+
+    "outDir": "./dist/", // 파일 생성 위치
+    "resolveJsonModule": true,
+    "strict": true,
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "./@types"]
+  },
+
+  "ts-node": {
+    "files": true, //false인 디폴트를 true로 바꿔줘야 ts-node 사용 시 에러 없음
+    "require": ["tsconfig-paths/register"]
+  }
+}

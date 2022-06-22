@@ -1,6 +1,8 @@
 import { Block } from '@core/blockChain/block';
-import { GENESIS } from '@core/blockChain/config';
+import { Chain } from '@core/blockChain/chain';
 describe('block test', () => {
+    let ws = new Chain();
+    let GENESIS = Block.getGenesis();
     it('block 생성', () => {
         const data = [
             {
@@ -9,8 +11,13 @@ describe('block test', () => {
                 hash: 'cccc',
             },
         ];
-        const block: Block = new Block(GENESIS, data);
-        const isValid = block.isValidNewBlock(GENESIS, block);
+        const adjustmentBlock = ws.getAdjustmentBlock();
+        const block: Block = new Block(GENESIS, data, adjustmentBlock);
+        const isValid = Block.isValidNewBlock(GENESIS, block);
         console.log(isValid);
+        ws.addBlock(GENESIS, data, block);
+        console.log(ws.getChain());
+        console.log(ws.getLatestBlock());
+        console.log(ws.getLength());
     });
 });

@@ -13,13 +13,13 @@ export class Block extends BlockHeader implements IBlock {
         super(_previousBlock);
         this.merkleRoot = Block.getMerkleRoot(_data);
         this.nonce = 0;
-        this.difficulty = 0;
+        this.difficulty = this.getDifficulty();
         this.data = _data;
         this.hash = Block.createBlockHash(this);
     }
     static getMerkleRoot(_data: ITransaction[]): string {
         const merkleTree = merkle('sha256').sync(_data);
-        const merkleRoot = merkleTree.root().toString();
+        const merkleRoot = merkleTree.root();
         return merkleRoot;
     }
     static createBlockHash({ version, height, timestamp, previousHash, merkleRoot, nonce, difficulty }: Block): string {
@@ -30,8 +30,12 @@ export class Block extends BlockHeader implements IBlock {
         const newBlock = new Block(_previousBlock, _data);
         return newBlock;
     }
+    findBlock() {}
+    getDifficulty() {
+        return 1;
+    }
+
     isValidNewBlock(_previousBlock: IBlock, _newBlock: Block): Failable<Block, string> {
-        //1. 높이 비교 2. 이전 해시 비교 3. 해시비교
         if (_newBlock.height !== _previousBlock.height + 1) {
             return {
                 isError: true,

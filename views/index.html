@@ -65,6 +65,17 @@
             walletList.innerHTML = accountList;
         };
 
+        const sendTransaction = async () => {
+            const receivedAccount = document.querySelector('#receivedAccount').value;
+            const amount = document.querySelector('#amount').value;
+            const data = {
+                receivedAccount,
+                amount,
+            };
+            console.log(data);
+            const response = await axios.post('/sendTransaction');
+        };
+
         createWalletBtn.addEventListener('click', createWallet);
         getWalletListBtn.addEventListener('click', getWalletList);
         sendTransactionBtn.addEventListener('click', sendTransaction);

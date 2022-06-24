@@ -1,6 +1,5 @@
 import { WebSocket } from 'ws';
 import { Chain } from '@core/blockChain/chain';
-import { Socket } from 'dgram';
 
 export class P2PServer extends Chain {
     sockets: WebSocket[];
@@ -40,8 +39,9 @@ export class P2PServer extends Chain {
     }
     messageHandler(_socket: WebSocket) {
         const callBack = (data: string) => {
-            const result: Message = P2PServer.dataParse(data);
+            const result: Message = P2PServer.dataParse<Message>(data);
             const send = this.send(_socket);
+
             switch (result.type) {
                 case MessageType.latest_block: {
                     const message: Message = {
@@ -57,15 +57,17 @@ export class P2PServer extends Chain {
                         payload: this.getChain(),
                     };
                     const [receivedBlock] = result.payload;
-                    this.addToChain(receivedBlock);
+                    const isValid = this.addToChain(receivedBlock);
+                    if (!isValid.isError) break;
+
                     send(message);
                     break;
                     //addToChain 생성
                 }
                 case MessageType.receivedChain: {
-                  const { receivedChain } = result.payload;
-                  this.handleChainResponse(receivedChain)
-                  break;
+                    const receivedChain: IBlock[] = result.payload;
+                    this.handleChainResponse(receivedChain);
+                    break;
                 }
             }
         };
@@ -78,32 +80,41 @@ export class P2PServer extends Chain {
         _socket.on('close', close);
         _socket.on('error', close);
     }
+
     send(_socket: WebSocket) {
         return (_data: Message) => {
             _socket.send(JSON.stringify(_data));
         };
     }
+
     broadCast(_data: Message): void {
         this.sockets.forEach((socket) => this.send(socket)(_data));
     }
-    handleChainResponse(_receivedChain:IBlock[]):Failable<undefined,string> {
-        //체인응답
-      const isValid = this.isValidChain(_receivedChain)
-      if(isValid.isError) return {
-        isError:true,
-        error:isValid.error
-      }
 
-        const message: Message = {
-          type: MessageType.receivedChain,
-          payload:
+    handleChainResponse(_receivedChain: IBlock[]): Failable<undefined, string> {
+        //체인응답
+        const isValid = this.isValidChain(_receivedChain);
+        if (isValid.isError)
+            return {
+                isError: true,
+                error: isValid.error,
+            };
+
+        const isReplaced = this.replaceChain(_receivedChain);
+        if (isReplaced.isError) {
+            return { isError: true, error: isReplaced.error };
+        }
+
+        const msg: Message = {
+            type: MessageType.receivedChain,
+            payload: _receivedChain,
         };
-        this.send(message)
+        this.broadCast(msg);
 
         return {
-          isError:false,
-          value: undefined
-        }
+            isError: false,
+            value: undefined,
+        };
     }
 
     static dataParse<T>(_data: string): T {

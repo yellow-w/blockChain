@@ -17,7 +17,11 @@ app.post('/mineBlock', (req, res) => {
     res.send();
 });
 
-app.post('/sendTransaction', (req, res) => {});
+app.post('/sendTransaction', (req, res) => {
+    console.log('/sendTransaction');
+    console.log(req.body);
+    res.json({});
+});
 
 app.listen('3005', () => {
     console.log('server running on port 3005');

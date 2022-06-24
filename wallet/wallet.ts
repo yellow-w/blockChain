@@ -1,4 +1,5 @@
 import { randomBytes } from 'crypto';
+import { SHA256 } from 'crypto-js';
 import elliptic from 'elliptic';
 
 import fs from 'fs';
@@ -34,7 +35,19 @@ export class Wallet {
         return fileContent.toString();
     }
 
-    //createSignature
+    static createSign = (_obj: any): elliptic.ec.Signature => {
+        const {
+            sender: { publicKey, account },
+            received,
+            amount,
+        } = _obj;
+
+        const hash: string = SHA256([publicKey, received, amount].join('')).toString();
+        const privateKey = this.getWalletPrivateKey(account);
+        const keyPair = ec.keyFromPrivate(privateKey);
+        const sign = keyPair.sign(hash, 'hex');
+        return sign;
+    };
 
     getPrivateKey(): string {
         return randomBytes(32).toString('hex');
@@ -44,6 +57,6 @@ export class Wallet {
         return keyPair.getPublic().encode('hex', true);
     }
     getAccount(): string {
-        return Buffer.from(this.publicKey).toString();
+        return Buffer.from(this.publicKey).slice(26).toString();
     }
 }

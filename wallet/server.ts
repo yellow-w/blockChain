@@ -1,6 +1,12 @@
 import express from 'express';
 import nunjucks from 'nunjucks';
 import { Wallet } from './wallet';
+import axios from 'axios';
+
+//계정
+const request = axios.create({
+    baseURL: 'http://localhost:3005/',
+});
 
 const app = express();
 app.use(express.json());
@@ -14,20 +20,35 @@ app.get('/', (req, res) => {
 });
 
 app.post('/newWallet', (req, res) => {
-    const newWallet = new Wallet();
+    const newWallet: Wallet = new Wallet();
     newWallet.createWallet(newWallet);
     res.json(newWallet);
 });
 app.post('/getWalletList', (req, res) => {
-    const walletList = Wallet.getWalletList();
+    const walletList: string[] = Wallet.getWalletList();
     res.json(walletList);
 });
 
 app.get('/wallet/:account', (req, res) => {
     const { account } = req.params;
-    const privateKey = Wallet.getWalletPrivateKey(account);
-    const wallet = new Wallet(privateKey);
+    const privateKey: string = Wallet.getWalletPrivateKey(account);
+    const wallet: Wallet = new Wallet(privateKey);
     res.json(wallet);
+});
+
+app.post('/sendTransaction', async (req, res) => {
+    const data = req.body;
+    const signature: any = Wallet.createSign(data);
+    const txObject = {
+        ...data,
+        sender: {
+            publicKey: data.sender.publicKey,
+            signature,
+        },
+    };
+    //
+    const response = await request.post('/sendTransaction', txObject);
+    console.log(response.data);
 });
 
 app.listen(3001, () => {

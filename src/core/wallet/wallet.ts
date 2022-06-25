@@ -1,4 +1,5 @@
 import elliptic from 'elliptic';
+import { IUnspentTxOut } from 'transaction';
 const ec = new elliptic.ec('secp256k1');
 export type signature = elliptic.ec.Signature;
 

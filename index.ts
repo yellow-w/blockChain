@@ -1,4 +1,5 @@
 import { P2PServer } from '@core/serve/p2p';
+import { Wallet } from '@core/wallet/wallet';
 import express from 'express';
 import dotenv from 'dotenv';
 
@@ -28,7 +29,8 @@ app.post('/mineBlock', (req, res) => {
 });
 
 app.post('/sendTransaction', (req, res) => {
-    console.log(req.body);
+    // UnspentTxOUts.getUTXO();
+    Wallet.sendTransaction(req.body, unspentTxOuts);
     res.json({});
 });
 

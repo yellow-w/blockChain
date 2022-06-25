@@ -28,6 +28,7 @@ app.post('/mineBlock', (req, res) => {
 });
 
 app.post('/sendTransaction', (req, res) => {
+    console.log(req.body);
     res.json({});
 });
 

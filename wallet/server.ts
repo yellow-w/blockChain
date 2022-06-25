@@ -25,6 +25,7 @@ const request = axios.create({
         'Content-type': 'application/json',
     },
 });
+console.log(request);
 
 app.get('/', (req, res) => {
     res.render('index');
@@ -57,7 +58,6 @@ app.post('/sendTransaction', async (req, res) => {
             signature,
         },
     };
-    console.log(txObject);
     const response = await request.post('/sendTransaction', txObject);
     console.log(response.data);
 });

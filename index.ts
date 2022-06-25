@@ -10,7 +10,6 @@ app.use(express.json());
 
 app.use((req, res, next) => {
     const baseAuth: string = (req.headers.authorization || '').split(' ')[1];
-
     if (baseAuth === '') return res.status(401).send();
     const [userid, password] = Buffer.from(baseAuth, 'base64').toString().split(':');
     if (userid !== process.env.USERID || password !== process.env.USERPW) return res.status(401).send();
@@ -29,8 +28,6 @@ app.post('/mineBlock', (req, res) => {
 });
 
 app.post('/sendTransaction', (req, res) => {
-    console.log('/sendTransaction');
-    console.log(req.body);
     res.json({});
 });
 

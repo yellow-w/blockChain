@@ -3,6 +3,7 @@ import merkle from 'merkle';
 import { BlockHeader } from './blockHeader';
 import hexToBinary from 'hex-to-binary';
 import { UNIT, BLOCK_GENERATE_INTERVAL, DIFFICULTY_ADJUSTMENT_UNIT, GENESIS } from './config';
+import { ITransaction } from 'transaction';
 
 export class Block extends BlockHeader implements IBlock {
     merkleRoot: string;
@@ -32,11 +33,13 @@ export class Block extends BlockHeader implements IBlock {
         const value = `${version}${height}${timestamp}${merkleRoot}${previousHash}${height}${difficulty}${nonce}`;
         return SHA256(value).toString();
     }
+
     static generateBlock(_previousBlock: Block, _data: ITransaction[], _adjustmentBlock: Block): Block {
         const generateBlock = new Block(_previousBlock, _data, _adjustmentBlock);
         const newBlock = Block.findBlock(generateBlock);
         return newBlock;
     }
+
     static findBlock(_generateBlock: Block): Block {
         //nonce 값을 1씩 추가 시켜가면서 조건에 맞는 블럭 채굴하기
         let nonce: number = 0;

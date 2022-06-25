@@ -1,9 +1,13 @@
+import { Transaction } from '@core/transaction/transaction';
+import { TxIn } from '@core/transaction/txIn';
+import { TxOut } from '@core/transaction/txOut';
+import { UnspentTxOut } from '@core/transaction/unspentTxOut';
 import { Block } from './block';
-import { DIFFICULTY_ADJUSTMENT_UNIT } from './config';
+import { DIFFICULTY_ADJUSTMENT_UNIT, GENESIS } from './config';
 
 export class Chain {
     blockChain: Block[];
-    unspentTxOut: IUnspentTxOut[];
+    unspentTxOut: UnspentTxOut[];
     constructor() {
         this.blockChain = [Block.getGenesis()];
         this.unspentTxOut = [];
@@ -18,15 +22,28 @@ export class Chain {
     getLatestBlock() {
         return this.blockChain[this.blockChain.length - 1];
     }
-    addBlock(_previousBlock: Block, _data: ITransaction[], _newBlock: Block) {
-        //블럭 생성, 유효성 검증, 배열에 추가
 
+    miningBlock(_account: string): Failable<Block, string> {
+        //1. tx 생성
+        const txins: TxIn = new TxIn('', this.getLatestBlock().height + 1);
+        const txouts: TxOut = new TxOut(_account, 50);
+        const tx: Transaction = new Transaction([txins], [txouts]);
+
+        //return this.addBlock([transaction, ...this.getTransactionPool()]);
+
+        return this.addBlock([tx]); //수정해야함
+    }
+
+    addBlock(_data: Transaction[]): Failable<Block, string> {
+        //블럭 생성, 유효성 검증, 배열에 추가
         const previousBlock = this.getLatestBlock();
         const adjustmentBlock = this.getAdjustmentBlock();
         const newBlock = Block.generateBlock(previousBlock, _data, adjustmentBlock);
         const isValid = Block.isValidNewBlock(previousBlock, newBlock);
-        if (isValid.isError) return;
+        if (isValid.isError) return { isError: true, error: isValid.error };
         this.blockChain.push(isValid.value);
+        //utxo 업데이트 및 mempool 업데이트
+        return { isError: false, value: newBlock };
     }
     addToChain(_receivedBlock: Block): Failable<undefined, string> {
         const latestBlock = this.getLatestBlock();

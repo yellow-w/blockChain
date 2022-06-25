@@ -24,11 +24,14 @@ app.post('/addToPeer', (req, res) => {
 app.post('/addPeers', (req, res) => {});
 
 app.post('/mineBlock', (req, res) => {
+    const data = req.body;
+    ws.miningBlock(`${data}`);
     res.send();
 });
 
 app.post('/sendTransaction', (req, res) => {
-    console.log(req.body);
+    // UnspentTxOUts.getUTXO();
+    // Wallet.sendTransaction(req.body, unspentTxOuts);
     res.json({});
 });
 

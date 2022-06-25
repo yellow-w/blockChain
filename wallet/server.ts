@@ -25,7 +25,6 @@ const request = axios.create({
         'Content-type': 'application/json',
     },
 });
-console.log(request);
 
 app.get('/', (req, res) => {
     res.render('index');

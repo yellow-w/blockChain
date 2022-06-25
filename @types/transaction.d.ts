@@ -1,23 +1,25 @@
+import { signature } from '@core/wallet/wallet';
+
 declare interface ITxIn {
-  txOutId: string;
-  txOutIndex: number;
-  sigature: string;
+    txOutId: string;
+    txOutIndex: number;
+    sigature?: signature;
 }
 
 declare interface ITxOut {
-  account: string;
-  amount: number;
+    account: string;
+    amount: number;
 }
 
 declare interface ITransaction {
-  txIns: ITxIn[];
-  txOuts: ITxOut[];
-  hash: string;
+    txIns: ITxIn[];
+    txOuts: ITxOut[];
+    hash: string;
 }
 
 declare interface IUnspentTxOut {
-  txOutId: string;
-  txOutIndex: number;
-  account: string;
-  amount: number;
+    txOutId: string;
+    txOutIndex: number;
+    account: string;
+    amount: number;
 }
